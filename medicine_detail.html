@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ med.name }}</h1>
+<p class="muted">{{ med.generic_name }} • {{ med.strength }} {{ med.form }}</p>
+
+{% if invs %}
+  <h3>Available at</h3>
+  <ul class="list">
+  {% for inv, ph in invs %}
+    <li class="list-item">
+      <div>
+        <strong>{{ ph.name }}</strong>
+        <div class="muted">{{ ph.address }}{% if ph.phone %} • {{ ph.phone }}{% endif %}</div>
+      </div>
+      <div class="right">
+        <div>₹{{ "%.2f"|format(inv.price) }}</div>
+        <div class="muted">Stock: {{ inv.stock_qty }}</div>
+        {% if ph.latitude and ph.longitude %}
+          <a class="btn" target="_blank" href="https://www.google.com/maps?q={{ ph.latitude }},{{ ph.longitude }}">Map</a>
+        {% else %}
+          <a class="btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query={{ (ph.name ~ ' ' ~ ph.address) | urlencode }}">Map</a>
+        {% endif %}
+      </div>
+    </li>
+  {% endfor %}
+  </ul>
+{% else %}
+  <div class="card">
+    <p><strong>Not available right now.</strong></p>
+    <p>Here are alternatives with the same generic:</p>
+    <ul class="bullets">
+      {% for alt in alternatives %}
+        <li><a href="{{ url_for('medicine_detail', med_id=alt.id) }}">{{ alt.name }}</a> — {{ alt.strength }} {{ alt.form }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+{% endblock %}
